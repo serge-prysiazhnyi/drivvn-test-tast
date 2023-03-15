@@ -10,9 +10,11 @@ interface MatchProps {
 export const Match: React.FC<MatchProps> = ({ message }) => (
   <>
     {message ? (
-      <Row className="d-flex justify-content-center">{message}</Row>
+      <Row className="d-flex justify-content-center" data-testid="match-component">
+        {message}
+      </Row>
     ) : (
-      <div className={styles.MatchPlaceholder}></div>
+      <div className={styles.MatchPlaceholder} data-testid="match-placeholder"></div>
     )}
   </>
 );

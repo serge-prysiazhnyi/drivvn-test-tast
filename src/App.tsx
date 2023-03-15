@@ -113,8 +113,14 @@ function App() {
         <Result valueMatches={state.valueMatches} suitMatches={state.suitMatches} />
       )}
       {state.error && (
-        <Alert variant="danger" onClose={handleClearError} className="mt-3" dismissible>
-          {state.error}
+        <Alert
+          variant="danger"
+          onClose={handleClearError}
+          className="mt-3"
+          dismissible
+          data-testid="alert-component"
+        >
+          {`${state.error}`}
         </Alert>
       )}
     </Container>

@@ -12,7 +12,7 @@ interface CardsProps {
 export const Cards: React.FC<CardsProps> = ({ cards }) => (
   <>
     {cards.length > 0 && (
-      <Row className="d-flex justify-content-center">
+      <Row className="d-flex justify-content-center" data-testid="cards-component">
         {cards.map((card) => (
           <Card key={uuid4()} card={card} />
         ))}
