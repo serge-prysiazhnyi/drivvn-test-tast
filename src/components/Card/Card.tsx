@@ -13,7 +13,11 @@ export const Card: React.FC<CardProps> = ({ card }) => {
   return (
     <>
       {card ? (
-        <Col xs={4} className={styles.CardWrapper} data-testid="card-component">
+        <Col
+          xs={4}
+          className={`${styles.CardWrapper} ${styles.spinner}`}
+          data-testid="card-component"
+        >
           <Image src={card.image} className={styles.CardImage} data-testid="card-image" />
         </Col>
       ) : (

@@ -1,6 +1,6 @@
 import { CardItem } from '../types';
 
-export const cards: CardItem[] = [
+export const mockedCardsCollection: CardItem[] = [
   {
     code: 'QD',
     image: 'https://deckofcardsapi.com/static/img/QD.png',

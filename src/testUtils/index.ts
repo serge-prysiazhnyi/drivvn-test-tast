@@ -20,12 +20,6 @@ export const mockSigleCardResponse: FetchCardsResponse = {
 export const VALUE_MATCHES_RESULT = 'Value matches: 1';
 export const SUIT_MATCHES_RESULT = 'Suit matches: 12';
 
-export function* generateCards(cards: CardItem[]): Generator<CardItem> {
-  for (const card of cards) {
-    yield card;
-  }
-}
-
 export const useCounter = () => {
   let counter = 0;
 

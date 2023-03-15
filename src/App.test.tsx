@@ -10,7 +10,6 @@ import { afterEach, expect } from 'vitest';
 import App from './App';
 import { BASE_URL } from './constants';
 import {
-  generateCards,
   mockDeckId,
   mockDeckResponse,
   mockSigleCardResponse,
@@ -18,11 +17,10 @@ import {
   useCounter,
   VALUE_MATCHES_RESULT,
 } from './testUtils';
-import { cards } from './testUtils/mockDeck';
-import { CardItem, FetchCardsResponse } from './types';
+import { mockedCardsCollection } from './testUtils/mockDeck';
+import { FetchCardsResponse } from './types';
 
 let counter: () => number;
-let cardsGenerator: Generator<CardItem, any, unknown>;
 
 const server = setupServer(
   rest.get(`${BASE_URL}/new/shuffle/?deck_count=1`, (req, res, ctx) => {
@@ -30,8 +28,9 @@ const server = setupServer(
   }),
 
   rest.get(`${BASE_URL}/${mockDeckId}/draw/?count=1`, (req, res, ctx) => {
-    const card = cardsGenerator.next().value;
-    const newRemaining = cards.length - 1 - counter();
+    const count = counter();
+    const card = mockedCardsCollection[count];
+    const newRemaining = mockedCardsCollection.length - 1 - count;
 
     const response: FetchCardsResponse = {
       ...mockSigleCardResponse,
@@ -51,7 +50,6 @@ beforeAll(() => server.listen());
 
 // Refresh counter and cards generator
 beforeEach(() => {
-  cardsGenerator = generateCards(cards);
   counter = useCounter();
 });
 
@@ -88,7 +86,10 @@ describe('App', () => {
     await screen.getByTestId('card-component');
 
     // card image must be in the document
-    expect(screen.getByTestId('card-image')).toHaveAttribute('src', cards[0].image);
+    expect(screen.getByTestId('card-image')).toHaveAttribute(
+      'src',
+      mockedCardsCollection[0].image,
+    );
   });
 
   it('App: gets all cards and shows result', async () => {
