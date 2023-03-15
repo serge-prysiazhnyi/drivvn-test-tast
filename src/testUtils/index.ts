@@ -1,19 +1,20 @@
-import { CardItem, FetchCardsResponse, FetchDeckResponse } from '../types';
-import { cards } from './mockDeck';
+import { FetchCardsResponse, FetchDeckResponse } from '../types';
+import { mockedCardsCollection } from './mockDeck';
+import { CARDS_IN_DECK_AMOUNT } from '../constants';
 
 export const mockDeckId = '12345';
 
 export const mockDeckResponse: FetchDeckResponse = {
   deck_id: mockDeckId,
-  remaining: 52,
+  remaining: CARDS_IN_DECK_AMOUNT,
   shuffled: true,
   success: true,
 };
 
 export const mockSigleCardResponse: FetchCardsResponse = {
-  cards,
+  cards: mockedCardsCollection,
   deck_id: mockDeckId,
-  remaining: 51,
+  remaining: CARDS_IN_DECK_AMOUNT - 1,
   success: true,
 };
 

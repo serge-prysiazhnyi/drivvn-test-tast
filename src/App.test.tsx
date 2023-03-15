@@ -8,7 +8,7 @@ import { setupServer } from 'msw/node';
 import { afterEach, expect } from 'vitest';
 
 import App from './App';
-import { BASE_URL } from './constants';
+import { BASE_URL, CARDS_IN_DECK_AMOUNT } from './constants';
 import {
   mockDeckId,
   mockDeckResponse,
@@ -98,7 +98,7 @@ describe('App', () => {
     const drawCardButton = screen.getByText('Draw card');
 
     // Let's click 52 times to get all cards
-    for (let i = 0; i < 52; i++) {
+    for (let i = 0; i < CARDS_IN_DECK_AMOUNT; i++) {
       await userEvent.click(screen.getByRole('button'));
     }
 
@@ -111,5 +111,22 @@ describe('App', () => {
     expect(screen.getByTestId('suit-matches-count')).toHaveTextContent(
       SUIT_MATCHES_RESULT,
     );
+  });
+
+  it('App: shows alert component on fetch data error', async () => {
+    // Throw en error
+    server.use(
+      rest.get(`${BASE_URL}/${mockDeckId}/draw/?count=1`, (req, res, ctx) => {
+        return res(ctx.status(500));
+      }),
+    );
+
+    render(<App />);
+
+    await userEvent.click(screen.getByRole('button'));
+
+    const alert = await screen.getByTestId('alert-component');
+
+    expect(alert).toBeInTheDocument();
   });
 });
