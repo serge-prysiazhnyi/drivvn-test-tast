@@ -9,6 +9,7 @@ import { Button } from './components/Button';
 import { Cards } from './components/Cards';
 import { Match } from './components/Match';
 import { Result } from './components/Result';
+import { RemainingCounter } from './components/RemainingCounter';
 import { BASE_URL, CARDS_IN_DECK_AMOUNT } from './constants';
 import { getErrorMessage, getMatchMessage } from './helpers';
 import { AppState, FetchCardsResponse, FetchDeckResponse } from './types';
@@ -108,7 +109,10 @@ function App() {
       {state.remaining > 0 ? <Match message={matchMessage} /> : <Match message={null} />}
       <Cards cards={[state.previousCard, state.currentCard]} />
       {state.remaining > 0 ? (
-        <Button onClick={handleGetCard} disabled={state.isLoading} />
+        <>
+          <Button onClick={handleGetCard} disabled={state.isLoading} />
+          <RemainingCounter remaining={state.remaining} />
+        </>
       ) : (
         <Result valueMatches={state.valueMatches} suitMatches={state.suitMatches} />
       )}

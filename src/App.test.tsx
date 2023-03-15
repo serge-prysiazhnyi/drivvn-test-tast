@@ -75,6 +75,11 @@ describe('App', () => {
 
     // renders button
     expect(screen.getByRole('button')).toHaveTextContent('Draw card');
+
+    // renders cards counter
+    expect(screen.getByTestId('remaining-counter')).toHaveTextContent(
+      `Cards left: ${CARDS_IN_DECK_AMOUNT}`,
+    );
   });
 
   it('App: gets single card by click on `Draw card` button', async () => {
@@ -90,12 +95,18 @@ describe('App', () => {
       'src',
       mockedCardsCollection[0].image,
     );
+
+    // cards counter shows correct number of rest cards
+    expect(screen.getByTestId('remaining-counter')).toHaveTextContent(
+      `Cards left: ${CARDS_IN_DECK_AMOUNT - 1}`,
+    );
   });
 
   it('App: gets all cards and shows result', async () => {
     render(<App />);
 
     const drawCardButton = screen.getByText('Draw card');
+    const cardsCounter = screen.getByTestId('remaining-counter');
 
     // Let's click 52 times to get all cards
     for (let i = 0; i < CARDS_IN_DECK_AMOUNT; i++) {
@@ -104,6 +115,10 @@ describe('App', () => {
 
     // Button must be hidden
     expect(drawCardButton).not.toBeInTheDocument();
+
+    // cards counter is hidden
+    expect(cardsCounter).not.toBeInTheDocument();
+
     // Check the result
     expect(screen.getByTestId('value-matches-count')).toHaveTextContent(
       VALUE_MATCHES_RESULT,
