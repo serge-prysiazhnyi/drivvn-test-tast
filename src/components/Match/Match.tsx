@@ -4,16 +4,15 @@ import Row from 'react-bootstrap/Row';
 import styles from './Match.module.css';
 
 interface MatchProps {
-  hasSuitMatch: boolean;
-  hasValueMatch: boolean;
+  message: string;
 }
 
-export const Match: React.FC<MatchProps> = ({ hasSuitMatch, hasValueMatch }) => {
-  if (!hasSuitMatch && !hasValueMatch) {
-    return <div className={styles.MatchPlaceholder}></div>;
-  }
-
-  const message = hasSuitMatch ? 'SNAP SUIT!' : 'SNAP VALUE!';
-
-  return <Row className="d-flex justify-content-center">{message}</Row>;
-};
+export const Match: React.FC<MatchProps> = ({ message }) => (
+  <>
+    {message ? (
+      <Row className="d-flex justify-content-center">{message}</Row>
+    ) : (
+      <div className={styles.MatchPlaceholder}></div>
+    )}
+  </>
+);

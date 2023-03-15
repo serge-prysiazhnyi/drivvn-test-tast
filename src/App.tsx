@@ -10,7 +10,7 @@ import { Cards } from './components/Cards';
 import { Match } from './components/Match';
 import { Result } from './components/Result';
 import { BASE_URL } from './constants';
-import { getErrorMessage } from './helpers';
+import { getErrorMessage, getMatchMessage } from './helpers';
 import { AppState, FetchCardsResponse, FetchDeckResponse } from './types';
 
 function App() {
@@ -101,12 +101,11 @@ function App() {
     }));
   }, []);
 
+  const matchMessage = getMatchMessage(state.hasSuitMatch, state.hasValueMatch);
+
   return (
     <Container className={state.isLoading ? 'AppLoading my-3' : 'my-3'}>
-      {/* FIX SHIFT */}
-      {state.remaining > 0 && (
-        <Match hasSuitMatch={state.hasSuitMatch} hasValueMatch={state.hasValueMatch} />
-      )}
+      {state.remaining > 0 ? <Match message={matchMessage} /> : <Match message={null} />}
       <Cards cards={[state.previousCard, state.currentCard]} />
       {state.remaining > 0 ? (
         <Button onClick={handleGetCard} disabled={state.isLoading} />
