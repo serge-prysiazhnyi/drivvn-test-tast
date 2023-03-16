@@ -1,5 +1,20 @@
 type Suits = 'HEARTS' | 'DIAMONDS' | 'CLUBS' | 'SPADES';
 
+export type Values =
+  | 'KING'
+  | 'JACK'
+  | 'ACE'
+  | 'QUEEN'
+  | '2'
+  | '3'
+  | '4'
+  | '5'
+  | '6'
+  | '7'
+  | '8'
+  | '9'
+  | '10';
+
 export interface CardItem {
   code: string;
   image: string;
@@ -8,7 +23,12 @@ export interface CardItem {
     svg: string;
   };
   suit: Suits;
-  value: string;
+  value: Values;
+}
+
+export interface DeckShape {
+  suits: Record<Suits, number>;
+  values: Record<Values, number>;
 }
 
 export interface AppState {
@@ -22,6 +42,9 @@ export interface AppState {
   remaining: number;
   valueMatches: number;
   suitMatches: number;
+  remainingDeckShape: DeckShape;
+  probabilityGetValueMatch: number;
+  probabilityGetSuitMatch: number;
 }
 
 interface FetchBaseResponse {

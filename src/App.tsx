@@ -9,9 +9,15 @@ import { Button } from './components/Button';
 import { Cards } from './components/Cards';
 import { Match } from './components/Match';
 import { Result } from './components/Result';
+import { ProbabilityInfo } from './components/ProbabilityInfo';
 import { RemainingCounter } from './components/RemainingCounter';
 import { BASE_URL, CARDS_IN_DECK_AMOUNT } from './constants';
-import { getErrorMessage, getMatchMessage } from './helpers';
+import {
+  getErrorMessage,
+  getMatchMessage,
+  initialDeckShape,
+  estimateProbabilityGetMatch,
+} from './helpers';
 import { AppState, FetchCardsResponse, FetchDeckResponse } from './types';
 
 function App() {
@@ -26,6 +32,9 @@ function App() {
     remaining: CARDS_IN_DECK_AMOUNT,
     valueMatches: 0,
     suitMatches: 0,
+    remainingDeckShape: initialDeckShape,
+    probabilityGetValueMatch: null,
+    probabilityGetSuitMatch: null,
   });
 
   useEffect(() => {
@@ -66,6 +75,16 @@ function App() {
       const newCurrent = prevState.cards[prevState.remaining - 1];
       const hasSuitMatch = prevState.currentCard?.suit === newCurrent.suit;
       const hasValueMatch = prevState.currentCard?.value === newCurrent.value;
+      const newRemainingDeckShape = {
+        suits: {
+          ...prevState.remainingDeckShape.suits,
+          [newCurrent.suit]: prevState.remainingDeckShape.suits[newCurrent.suit] - 1,
+        },
+        values: {
+          ...prevState.remainingDeckShape.values,
+          [newCurrent.value]: prevState.remainingDeckShape.values[newCurrent.value] - 1,
+        },
+      };
 
       return {
         ...prevState,
@@ -76,6 +95,15 @@ function App() {
         valueMatches: hasValueMatch ? prevState.valueMatches + 1 : prevState.valueMatches,
         suitMatches: hasSuitMatch ? prevState.suitMatches + 1 : prevState.suitMatches,
         remaining: prevState.remaining - 1,
+        remainingDeckShape: newRemainingDeckShape,
+        probabilityGetSuitMatch: estimateProbabilityGetMatch(
+          newRemainingDeckShape.suits[newCurrent.suit],
+          initialDeckShape.suitsNumber - 1,
+        ),
+        probabilityGetValueMatch: estimateProbabilityGetMatch(
+          newRemainingDeckShape.values[newCurrent.value],
+          initialDeckShape.valuesNumber - 1,
+        ),
       };
     });
   }, [state.remaining]);
@@ -107,6 +135,16 @@ function App() {
         <>
           <Button onClick={handleGetCard} disabled={state.isLoading} />
           <RemainingCounter remaining={state.remaining} />
+          <ProbabilityInfo
+            label="Probability of suit match:"
+            percentage={state.probabilityGetSuitMatch}
+            dataTestId="probabilityOfSuitMatch"
+          />
+          <ProbabilityInfo
+            label="Probability of value match:"
+            percentage={state.probabilityGetValueMatch}
+            dataTestId="probabilityOfValueMatch"
+          />
         </>
       ) : (
         <Result valueMatches={state.valueMatches} suitMatches={state.suitMatches} />

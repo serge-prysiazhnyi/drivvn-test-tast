@@ -125,4 +125,33 @@ describe('App', () => {
 
     expect(screen.getByTestId('alert-component')).toBeInTheDocument();
   });
+
+  it('App: shows correct probability of suit and value matches', async () => {
+    render(<App />);
+
+    await userEvent.click(screen.getByRole('button'));
+
+    const probabilityOfSuitMatch = await screen.getByTestId('probabilityOfSuitMatch');
+    const probabilityOfValueMatch = await screen.getByTestId('probabilityOfValueMatch');
+
+    // check probability initial values
+    expect(probabilityOfSuitMatch).toHaveTextContent('higher');
+    expect(probabilityOfValueMatch).toHaveTextContent('higher');
+
+    for (let i = 0; i < 6; i++) {
+      await userEvent.click(screen.getByRole('button'));
+    }
+
+    // check probability values after 5 clicks on the button
+    expect(probabilityOfSuitMatch).toHaveTextContent('higher');
+    expect(probabilityOfValueMatch).toHaveTextContent('medium');
+
+    for (let i = 0; i < 12; i++) {
+      await userEvent.click(screen.getByRole('button'));
+    }
+
+    // check probability values after 11 more clicks on the button
+    expect(probabilityOfSuitMatch).toHaveTextContent('medium');
+    expect(probabilityOfValueMatch).toHaveTextContent('low');
+  });
 });
