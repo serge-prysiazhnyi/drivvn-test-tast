@@ -16,7 +16,7 @@ import { AppState, FetchCardsResponse, FetchDeckResponse } from './types';
 
 function App() {
   const [state, setState] = useState<AppState>({
-    deckId: null,
+    cards: null,
     previousCard: null,
     currentCard: null,
     isLoading: false,
@@ -35,12 +35,19 @@ function App() {
           ...prevState,
           isLoading: true,
         }));
-        const res: FetchDeckResponse = await fetchData(
+        const deckDataResponse: FetchDeckResponse = await fetchData(
           `${BASE_URL}/new/shuffle/?deck_count=1`,
         );
+
+        // Fetch all deck to improve performance and avoid unnecessary requests by clicking draw btn
+        const cardsResponse: FetchCardsResponse = await fetchData(
+          `${BASE_URL}/${deckDataResponse.deck_id}/draw/?count=${CARDS_IN_DECK_AMOUNT}`,
+        );
+
         setState((prevState) => ({
           ...prevState,
-          deckId: res.deck_id,
+          cards: cardsResponse.cards,
+          remaining: deckDataResponse.remaining,
           isLoading: false,
         }));
       } catch (e) {
@@ -52,48 +59,26 @@ function App() {
       }
     };
     getData();
-  }, []);
+  }, [state.error]);
 
   const handleGetCard = useCallback(async () => {
-    try {
-      setState((prevState) => ({
+    setState((prevState) => {
+      const newCurrent = prevState.cards[prevState.remaining - 1];
+      const hasSuitMatch = prevState.currentCard?.suit === newCurrent.suit;
+      const hasValueMatch = prevState.currentCard?.value === newCurrent.value;
+
+      return {
         ...prevState,
-        isLoading: true,
-      }));
-
-      const res: FetchCardsResponse = await fetchData(
-        `${BASE_URL}/${state.deckId}/draw/?count=1`,
-      );
-
-      if (res.success) {
-        setState((prevState) => {
-          const newCurrent = res.cards[0];
-          const hasSuitMatch = prevState.currentCard?.suit === newCurrent.suit;
-          const hasValueMatch = prevState.currentCard?.value === newCurrent.value;
-
-          return {
-            ...prevState,
-            previousCard: prevState.currentCard,
-            currentCard: newCurrent,
-            isLoading: false,
-            hasSuitMatch,
-            hasValueMatch,
-            valueMatches: hasValueMatch
-              ? prevState.valueMatches + 1
-              : prevState.valueMatches,
-            suitMatches: hasSuitMatch ? prevState.suitMatches + 1 : prevState.suitMatches,
-            remaining: res.remaining,
-          };
-        });
-      }
-    } catch (e) {
-      setState((prevState) => ({
-        ...prevState,
-        isLoading: false,
-        error: getErrorMessage(e),
-      }));
-    }
-  }, [state.deckId]);
+        currentCard: newCurrent,
+        previousCard: prevState.currentCard,
+        hasSuitMatch,
+        hasValueMatch,
+        valueMatches: hasValueMatch ? prevState.valueMatches + 1 : prevState.valueMatches,
+        suitMatches: hasSuitMatch ? prevState.suitMatches + 1 : prevState.suitMatches,
+        remaining: prevState.remaining - 1,
+      };
+    });
+  }, [state.remaining]);
 
   const handleClearError = useCallback(() => {
     setState((prevState) => ({
@@ -108,15 +93,7 @@ function App() {
     <Container className={state.isLoading ? 'AppLoading my-3' : 'my-3'}>
       {state.remaining > 0 ? <Match message={matchMessage} /> : <Match message={null} />}
       <Cards cards={[state.previousCard, state.currentCard]} />
-      {state.remaining > 0 ? (
-        <>
-          <Button onClick={handleGetCard} disabled={state.isLoading} />
-          <RemainingCounter remaining={state.remaining} />
-        </>
-      ) : (
-        <Result valueMatches={state.valueMatches} suitMatches={state.suitMatches} />
-      )}
-      {state.error && (
+      {state.error ? (
         <Alert
           variant="danger"
           onClose={handleClearError}
@@ -126,6 +103,13 @@ function App() {
         >
           {`${state.error}`}
         </Alert>
+      ) : state.remaining > 0 ? (
+        <>
+          <Button onClick={handleGetCard} disabled={state.isLoading} />
+          <RemainingCounter remaining={state.remaining} />
+        </>
+      ) : (
+        <Result valueMatches={state.valueMatches} suitMatches={state.suitMatches} />
       )}
     </Container>
   );

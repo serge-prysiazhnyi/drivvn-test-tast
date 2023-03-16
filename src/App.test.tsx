@@ -1,6 +1,6 @@
 import matchers from '@testing-library/jest-dom/matchers';
 import { cleanup } from '@testing-library/react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
@@ -11,34 +11,23 @@ import { BASE_URL, CARDS_IN_DECK_AMOUNT } from './constants';
 import {
   mockDeckId,
   mockDeckResponse,
-  mockSigleCardResponse,
+  mockCardsResponse,
   SUIT_MATCHES_RESULT,
-  useCounter,
   VALUE_MATCHES_RESULT,
 } from './testUtils';
 import { mockedCardsCollection } from './testUtils/mockDeck';
-import { FetchCardsResponse } from './types';
-
-let responseCounter: () => number;
 
 const server = setupServer(
   rest.get(`${BASE_URL}/new/shuffle/?deck_count=1`, (req, res, ctx) => {
     return res(ctx.json(mockDeckResponse));
   }),
 
-  rest.get(`${BASE_URL}/${mockDeckId}/draw/?count=1`, (req, res, ctx) => {
-    const count = responseCounter();
-    const card = mockedCardsCollection[count];
-    const newRemaining = mockedCardsCollection.length - 1 - count;
-
-    const response: FetchCardsResponse = {
-      ...mockSigleCardResponse,
-      cards: [card],
-      remaining: newRemaining,
-    };
-
-    return res(ctx.json(response));
-  }),
+  rest.get(
+    `${BASE_URL}/${mockDeckId}/draw/?count=${CARDS_IN_DECK_AMOUNT}`,
+    (req, res, ctx) => {
+      return res(ctx.json(mockCardsResponse));
+    },
+  ),
 );
 
 // extends Vitest's expect method with methods from react-testing-library
@@ -46,11 +35,6 @@ expect.extend(matchers);
 
 // Enable request interception.
 beforeAll(() => server.listen());
-
-// Refresh counter and cards generator
-beforeEach(() => {
-  responseCounter = useCounter();
-});
 
 // Reset handlers so that each test could alter them
 // without affecting other, unrelated tests.
@@ -92,7 +76,7 @@ describe('App', () => {
     // card image must be in the document
     expect(screen.getByTestId('card-image')).toHaveAttribute(
       'src',
-      mockedCardsCollection[0].image,
+      mockedCardsCollection[mockedCardsCollection.length - 1].image,
     );
 
     // cards counter shows correct number of rest cards
@@ -130,17 +114,15 @@ describe('App', () => {
   it('App: shows alert component on fetch data error', async () => {
     // Throw en error
     server.use(
-      rest.get(`${BASE_URL}/${mockDeckId}/draw/?count=1`, (req, res, ctx) => {
+      rest.get(`${BASE_URL}/new/shuffle/?deck_count=1`, (req, res, ctx) => {
         return res(ctx.status(500));
       }),
     );
 
     render(<App />);
 
-    await userEvent.click(screen.getByRole('button'));
+    await waitFor(() => screen.getByTestId('alert-component'));
 
-    const alert = await screen.getByTestId('alert-component');
-
-    expect(alert).toBeInTheDocument();
+    expect(screen.getByTestId('alert-component')).toBeInTheDocument();
   });
 });

@@ -12,7 +12,7 @@ export interface CardItem {
 }
 
 export interface AppState {
-  deckId: string;
+  cards: CardItem[];
   previousCard: CardItem;
   currentCard: CardItem;
   isLoading: boolean;

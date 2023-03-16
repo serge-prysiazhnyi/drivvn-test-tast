@@ -11,7 +11,7 @@ export const mockDeckResponse: FetchDeckResponse = {
   success: true,
 };
 
-export const mockSigleCardResponse: FetchCardsResponse = {
+export const mockCardsResponse: FetchCardsResponse = {
   cards: mockedCardsCollection,
   deck_id: mockDeckId,
   remaining: CARDS_IN_DECK_AMOUNT - 1,
@@ -20,9 +20,3 @@ export const mockSigleCardResponse: FetchCardsResponse = {
 
 export const VALUE_MATCHES_RESULT = 'Value matches: 1';
 export const SUIT_MATCHES_RESULT = 'Suit matches: 12';
-
-export const useCounter = () => {
-  let counter = 0;
-
-  return () => counter++;
-};
