@@ -1,8 +1,7 @@
 import matchers from '@testing-library/jest-dom/matchers';
 import { cleanup } from '@testing-library/react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-// import API mocking utilities from Mock Service Worker
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
 import { afterEach, expect } from 'vitest';
@@ -20,7 +19,7 @@ import {
 import { mockedCardsCollection } from './testUtils/mockDeck';
 import { FetchCardsResponse } from './types';
 
-let counter: () => number;
+let responseCounter: () => number;
 
 const server = setupServer(
   rest.get(`${BASE_URL}/new/shuffle/?deck_count=1`, (req, res, ctx) => {
@@ -28,7 +27,7 @@ const server = setupServer(
   }),
 
   rest.get(`${BASE_URL}/${mockDeckId}/draw/?count=1`, (req, res, ctx) => {
-    const count = counter();
+    const count = responseCounter();
     const card = mockedCardsCollection[count];
     const newRemaining = mockedCardsCollection.length - 1 - count;
 
@@ -50,7 +49,7 @@ beforeAll(() => server.listen());
 
 // Refresh counter and cards generator
 beforeEach(() => {
-  counter = useCounter();
+  responseCounter = useCounter();
 });
 
 // Reset handlers so that each test could alter them
