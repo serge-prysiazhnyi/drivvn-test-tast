@@ -1,6 +1,6 @@
+import { CARDS_IN_DECK_AMOUNT } from '../constants';
 import { FetchCardsResponse, FetchDeckResponse } from '../types';
 import { mockedCardsCollection } from './mockDeck';
-import { CARDS_IN_DECK_AMOUNT } from '../constants';
 
 export const mockDeckId = '12345';
 

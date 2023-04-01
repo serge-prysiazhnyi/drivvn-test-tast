@@ -9,9 +9,9 @@ import { afterEach, expect } from 'vitest';
 import App from './App';
 import { BASE_URL, CARDS_IN_DECK_AMOUNT } from './constants';
 import {
+  mockCardsResponse,
   mockDeckId,
   mockDeckResponse,
-  mockCardsResponse,
   SUIT_MATCHES_RESULT,
   VALUE_MATCHES_RESULT,
 } from './testUtils';

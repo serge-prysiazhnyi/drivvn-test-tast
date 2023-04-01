@@ -8,15 +8,15 @@ import { fetchData } from './apiService';
 import { Button } from './components/Button';
 import { Cards } from './components/Cards';
 import { Match } from './components/Match';
-import { Result } from './components/Result';
 import { ProbabilityInfo } from './components/ProbabilityInfo';
 import { RemainingCounter } from './components/RemainingCounter';
+import { Result } from './components/Result';
 import { BASE_URL, CARDS_IN_DECK_AMOUNT } from './constants';
 import {
+  estimateProbabilityGetMatch,
   getErrorMessage,
   getMatchMessage,
   initialDeckShape,
-  estimateProbabilityGetMatch,
 } from './helpers';
 import { AppState, FetchCardsResponse, FetchDeckResponse } from './types';
 
